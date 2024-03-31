@@ -1,16 +1,29 @@
-# This is a sample Python script.
-
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from configurations.database.initialize_db import connecting_to_db, creating_metadata, get_entities
+from configurations.firebase.routes.routes_firebase import routes
+from datetime import datetime, time
+import asyncio
 
 
-# Press the green button in the gutter to run the script.
+async def main():
+    creating_metadata()
+    sensors = routes(route="sensors").get()
+
+    for sensor, measures in sensors.items():
+        for measurement, value in measures.items():
+            db = connecting_to_db()
+            await db.connect()
+            await db.execute(
+                get_entities(entity="data").insert().values(
+                    date=datetime.now().date(),
+                    time=time.fromisoformat(datetime.now().strftime("%H:%M:%S")),
+                    type=measurement,
+                    sensor=sensor,
+                    value=value,
+                )
+            )
+            await db.disconnect()
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

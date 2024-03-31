@@ -12,4 +12,4 @@ list_routes = {
 
 
 def routes(route):
-    return list_routes[route]
+    return list_routes[str(route)]
