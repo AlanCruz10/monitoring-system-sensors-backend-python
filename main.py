@@ -1,27 +1,19 @@
-from configurations.database.initialize_db import connecting_to_db, creating_metadata, get_entities
+from configurations.database.initialize_db import creating_metadata
 from configurations.firebase.routes.routes_firebase import routes
-from datetime import datetime, time
+from services.data_service import save_data
 import asyncio
 
 
 async def main():
     creating_metadata()
-    sensors = routes(route="sensors").get()
-
-    for sensor, measures in sensors.items():
-        for measurement, value in measures.items():
-            db = connecting_to_db()
-            await db.connect()
-            await db.execute(
-                get_entities(entity="data").insert().values(
-                    date=datetime.now().date(),
-                    time=time.fromisoformat(datetime.now().strftime("%H:%M:%S")),
-                    type=measurement,
-                    sensor=sensor,
-                    value=value,
-                )
-            )
-            await db.disconnect()
+    time_saved = 0
+    while True:
+        sensors = routes(route="sensors").get()
+        time_saved += 1
+        if time_saved == 5:
+            await save_data(data=sensors)
+            time_saved = 0
+        await asyncio.sleep(1)
 
 
 if __name__ == '__main__':
