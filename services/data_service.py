@@ -13,7 +13,7 @@ async def save_data(data):
                     date=date_now.date(),
                     time=time.fromisoformat(date_now.strftime("%H:%M:%S")),
                     type=measurement,
-                    sensor=sensor,
+                    sensor=sensor.lower().replace(" ", ""),
                     value=value,
                 )
             )
