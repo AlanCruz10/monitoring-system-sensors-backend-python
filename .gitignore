@@ -1,2 +1,5 @@
-
+# Firebase
 configurations/firebase/credentials/credential_firebase.json
+
+# Database
+configurations/database/credentials/credential_database.py
