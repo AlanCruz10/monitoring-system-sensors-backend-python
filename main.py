@@ -1,16 +1,21 @@
-# This is a sample Python script.
-
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from configurations.database.initialize_db import creating_metadata
+from configurations.firebase.routes.routes_firebase import routes
+from services.data_service import save_data
+import asyncio
 
 
-# Press the green button in the gutter to run the script.
+async def main():
+    creating_metadata()
+    time_saved = 0
+    while True:
+        sensors = routes(route="sensors").get()
+        time_saved += 1
+        if time_saved == 5:
+            await save_data(data=sensors)
+            time_saved = 0
+        await asyncio.sleep(1)
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
