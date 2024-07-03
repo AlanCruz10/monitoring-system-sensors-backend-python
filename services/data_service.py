@@ -1,3 +1,4 @@
+import logging
 from configurations.database.initialize_db import connecting_to_db, get_entities
 from datetime import datetime, time
 

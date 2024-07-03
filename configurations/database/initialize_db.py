@@ -2,25 +2,29 @@ import databases
 import databases.backends
 import databases.backends.mysql
 import sqlalchemy
-from configurations.database.credentials.credential_database import DATABASE_URL
 from configurations.database.entities.data import dato
+from os import getenv
+from dotenv import load_dotenv
+from configurations.console.logger import logger
 
 entities_instance = None
 
+load_dotenv()
+
 
 def connecting_to_db():
-    return databases.Database(DATABASE_URL)
+    return databases.Database(getenv('URL_DATABASE'))
 
 
 def creating_metadata():
-    print("Creating MetaData ...")
+    logger.info("Creating MetaData ...")
     metadata = sqlalchemy.MetaData()
     # Add entities to create tables in the database
     dato(metadata)
-    engine = sqlalchemy.create_engine(DATABASE_URL)
+    engine = sqlalchemy.create_engine(getenv('URL_DATABASE'))
     metadata.create_all(engine)
     get_instance_metadata(metadata=metadata)
-    print("Metadata Created ...")
+    logger.info("Metadata Created ...")
 
 
 def get_instance_metadata(metadata):
